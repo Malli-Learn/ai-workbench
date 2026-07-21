@@ -11,7 +11,7 @@ The plugins are organized into specific workflow categories to ensure clarity an
 | Plugin Name | Category | Version | Status |
 |---|---|---|---|
 | jira-story-generator | Business Workflows | 0.1.0 | Initial scaffold |
-| pull-request-description | Engineering Workflows | 0.1.0 | Initial scaffold |
+| mr-description | Engineering Workflows | 0.1.0 | Initial scaffold |
 | release-notes-generator | Engineering Workflows | 0.1.0 | Initial scaffold |
 | java-unit-test-coverage | Java Engineering | 0.1.0 | Initial scaffold |
 | java-jacoco-analysis | Java Engineering | 0.1.0 | Initial scaffold |

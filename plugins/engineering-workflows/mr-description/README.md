@@ -1,5 +1,5 @@
 ---
-name: pull-request-description
+name: mr-description
 ---
 
 # Pull Request Description
@@ -14,7 +14,7 @@ Generate structured pull request and merge request descriptions from code change
 
 ## Included agent
 
-- `pull-request-description.agent.md`
+- `mr-description.agent.md`
 
 ## Included skill
 

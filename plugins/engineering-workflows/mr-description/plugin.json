@@ -1,5 +1,5 @@
 {
-  "name": "pull-request-description",
+  "name": "mr-description",
   "description": "Generate structured pull request and merge request descriptions from code changes.",
   "version": "0.1.0",
   "author": {

@@ -15,10 +15,10 @@
       "source": "plugins/business-workflows/jira-story-generator"
     },
     {
-      "name": "pull-request-description",
+      "name": "mr-description",
       "description": "Generate structured pull request and merge request descriptions from code changes.",
       "version": "0.1.0",
-      "source": "plugins/engineering-workflows/pull-request-description"
+      "source": "plugins/engineering-workflows/mr-description"
     },
     {
       "name": "release-notes-generator",

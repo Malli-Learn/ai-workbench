@@ -9,9 +9,9 @@
 - **Status:** Initial scaffold
 
 ## Engineering Workflows
-- **Plugin:** pull-request-description
+- **Plugin:** mr-description
 - **Purpose:** Generate structured pull request and merge request descriptions from code changes.
-- **Agent:** pull-request-description
+- **Agent:** mr-description
 - **Skill:** pull-request-change-summary
 - **Version:** 0.1.0
 - **Status:** Initial scaffold
