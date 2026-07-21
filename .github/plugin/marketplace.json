@@ -1,0 +1,78 @@
+{
+  "name": "digital-ai-workbench",
+  "owner": {
+    "name": "Digital AI Workbench Team"
+  },
+  "metadata": {
+    "description": "Enterprise AI agents and skills for business, engineering, architecture, Java, and React Native workflows.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "jira-story-generator",
+      "description": "Generate structured Jira stories and acceptance criteria from business requirements.",
+      "version": "0.1.0",
+      "source": "plugins/business-workflows/jira-story-generator"
+    },
+    {
+      "name": "pull-request-description",
+      "description": "Generate structured pull request and merge request descriptions from code changes.",
+      "version": "0.1.0",
+      "source": "plugins/engineering-workflows/pull-request-description"
+    },
+    {
+      "name": "release-notes-generator",
+      "description": "Generate release notes from completed changes, stories, commits, and pull requests.",
+      "version": "0.1.0",
+      "source": "plugins/engineering-workflows/release-notes-generator"
+    },
+    {
+      "name": "java-unit-test-coverage",
+      "description": "Analyze Java unit-test coverage gaps and generate JUnit and Mockito tests.",
+      "version": "0.1.0",
+      "source": "plugins/java-engineering/java-unit-test-coverage"
+    },
+    {
+      "name": "java-jacoco-analysis",
+      "description": "Analyze JaCoCo coverage reports and identify high-priority Java coverage gaps.",
+      "version": "0.1.0",
+      "source": "plugins/java-engineering/java-jacoco-analysis"
+    },
+    {
+      "name": "java-code-cleanup",
+      "description": "Review and safely clean Java code without changing expected behavior.",
+      "version": "0.1.0",
+      "source": "plugins/java-engineering/java-code-cleanup"
+    },
+    {
+      "name": "react-native-unit-test-coverage",
+      "description": "Analyze Jest coverage and generate React Native unit and component tests.",
+      "version": "0.1.0",
+      "source": "plugins/react-native-engineering/react-native-unit-test-coverage"
+    },
+    {
+      "name": "react-native-code-cleanup",
+      "description": "Review and safely clean React Native JavaScript and TypeScript code.",
+      "version": "0.1.0",
+      "source": "plugins/react-native-engineering/react-native-code-cleanup"
+    },
+    {
+      "name": "technical-design-generator",
+      "description": "Generate technical design documentation from requirements and source code.",
+      "version": "0.1.0",
+      "source": "plugins/architecture-workflows/technical-design-generator"
+    },
+    {
+      "name": "architecture-diagram-generator",
+      "description": "Generate architecture and Mermaid diagrams from requirements and source code.",
+      "version": "0.1.0",
+      "source": "plugins/architecture-workflows/architecture-diagram-generator"
+    },
+    {
+      "name": "code-documentation-generator",
+      "description": "Generate functional and technical documentation from source code.",
+      "version": "0.1.0",
+      "source": "plugins/architecture-workflows/code-documentation-generator"
+    }
+  ]
+}

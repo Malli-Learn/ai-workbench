@@ -1,0 +1,10 @@
+{
+  "name": "java-jacoco-analysis",
+  "description": "Analyze JaCoCo coverage reports and identify high-priority Java coverage gaps.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Digital AI Workbench Team"
+  },
+  "agents": "agents/",
+  "skills": "skills/"
+}

@@ -1,0 +1,10 @@
+{
+  "name": "java-code-cleanup",
+  "description": "Review and safely clean Java code without changing expected behavior.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Digital AI Workbench Team"
+  },
+  "agents": "agents/",
+  "skills": "skills/"
+}

@@ -1,0 +1,10 @@
+{
+  "name": "react-native-code-cleanup",
+  "description": "Review and safely clean React Native JavaScript and TypeScript code.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Digital AI Workbench Team"
+  },
+  "agents": "agents/",
+  "skills": "skills/"
+}

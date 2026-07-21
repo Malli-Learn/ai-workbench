@@ -1,0 +1,10 @@
+{
+  "name": "java-unit-test-coverage",
+  "description": "Analyze Java unit-test coverage gaps and generate JUnit and Mockito tests.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Digital AI Workbench Team"
+  },
+  "agents": "agents/",
+  "skills": "skills/"
+}

@@ -1,0 +1,10 @@
+{
+  "name": "jira-story-generator",
+  "description": "Generate structured Jira stories and acceptance criteria from business requirements.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Digital AI Workbench Team"
+  },
+  "agents": "agents/",
+  "skills": "skills/"
+}

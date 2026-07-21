@@ -1,0 +1,10 @@
+{
+  "name": "react-native-unit-test-coverage",
+  "description": "Analyze Jest coverage and generate React Native unit and component tests.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Digital AI Workbench Team"
+  },
+  "agents": "agents/",
+  "skills": "skills/"
+}

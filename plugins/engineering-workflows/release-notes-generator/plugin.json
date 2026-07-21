@@ -1,0 +1,10 @@
+{
+  "name": "release-notes-generator",
+  "description": "Generate release notes from completed changes, stories, commits, and pull requests.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Digital AI Workbench Team"
+  },
+  "agents": "agents/",
+  "skills": "skills/"
+}
