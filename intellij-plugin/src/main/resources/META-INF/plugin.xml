@@ -1,0 +1,28 @@
+<idea-plugin>
+    <id>com.digitalai.workbench.intellij</id>
+    <name>Digital AI Workbench</name>
+    <vendor>Digital AI Workbench Team</vendor>
+    <version>0.1.0</version>
+    
+    <description><![CDATA[
+      Provides a native catalog UI to browse and install custom GitHub Copilot agents and skills.
+      Installs them directly to your personal locations.
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="Digital AI Workbench"
+                    anchor="right"
+                    icon="/icons/workbench.svg"
+                    factoryClass="com.digitalai.workbench.ui.DigitalAiWorkbenchToolWindowFactory"/>
+                    
+        <applicationConfigurable parentId="tools"
+                                 instance="com.digitalai.workbench.settings.WorkbenchSettingsConfigurable"
+                                 id="com.digitalai.workbench.settings.WorkbenchSettingsConfigurable"
+                                 displayName="Digital AI Workbench"/>
+
+        <applicationService serviceImplementation="com.digitalai.workbench.settings.WorkbenchSettings"/>
+        <applicationService serviceImplementation="com.digitalai.workbench.install.InstallationRegistryService"/>
+    </extensions>
+</idea-plugin>

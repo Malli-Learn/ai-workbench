@@ -16,6 +16,8 @@ Desktop.ini
 # IntelliJ
 .idea/
 *.iml
+.gradle/
+.intellijPlatform/
 
 # Antigravity
 .antigravity/
@@ -43,6 +45,7 @@ temp/
 # Logs
 logs/
 *.log
+hs_err_pid*.log
 
 # Environment
 .env
