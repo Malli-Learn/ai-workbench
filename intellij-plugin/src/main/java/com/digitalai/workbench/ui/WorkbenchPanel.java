@@ -213,8 +213,7 @@ public class WorkbenchPanel {
             if (installedOnly && !isInstalled) continue;
             
             if (catFilter != null && !catFilter.equals("All Categories") && !catFilter.equals(inferredCat)) {
-                if (catFilter.equals("Other") && !inferredCat.equals("Other")) continue;
-                if (!catFilter.equals("Other") && !catFilter.equals(inferredCat)) continue;
+                continue;
             }
             
             if (!search.isEmpty()) {

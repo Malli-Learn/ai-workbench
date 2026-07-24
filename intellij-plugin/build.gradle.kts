@@ -17,7 +17,6 @@ dependencies {
     intellijPlatform {
         intellijIdeaUltimate(providers.gradleProperty("platformVersion").get())
         pluginVerifier()
-        zipSigner()
     }
     implementation("com.google.code.gson:gson:${providers.gradleProperty("gsonVersion").get()}")
     testImplementation("junit:junit:4.13.2")

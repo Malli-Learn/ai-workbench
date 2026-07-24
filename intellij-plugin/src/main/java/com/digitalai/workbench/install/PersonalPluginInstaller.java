@@ -2,7 +2,6 @@ package com.digitalai.workbench.install;
 
 import com.digitalai.workbench.catalog.model.MarketplacePluginEntry;
 import com.digitalai.workbench.catalog.model.PluginManifest;
-import com.intellij.openapi.diagnostic.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -18,7 +17,6 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class PersonalPluginInstaller {
-    private static final Logger LOG = Logger.getInstance(PersonalPluginInstaller.class);
     private final ChecksumService checksumService = new ChecksumService();
     private final Supplier<InstallationRegistry> registrySupplier;
     private final Consumer<InstallationRegistry> registrySaver;
