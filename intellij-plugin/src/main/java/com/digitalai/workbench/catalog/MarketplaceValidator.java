@@ -5,6 +5,7 @@ import com.digitalai.workbench.catalog.model.MarketplacePluginEntry;
 import com.digitalai.workbench.catalog.model.PluginManifest;
 
 import java.io.File;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,24 +36,76 @@ public class MarketplaceValidator {
     }
 
     public boolean validatePluginEntry(MarketplacePluginEntry entry, File repositoryRoot) {
-        if (entry == null || entry.getSource() == null || entry.getSource().contains("..")) {
-            return false;
+        return getPluginEntryValidationError(entry, repositoryRoot) == null;
+    }
+
+    public String getPluginEntryValidationError(MarketplacePluginEntry entry, File repositoryRoot) {
+        if (entry == null) {
+            return "Marketplace plugin entry is missing.";
         }
-        File sourceDir = new File(repositoryRoot, entry.getSource());
+        if (repositoryRoot == null) {
+            return "Catalog directory is not loaded. Refresh the catalog and try again.";
+        }
+        if (!repositoryRoot.exists() || !repositoryRoot.isDirectory()) {
+            return "Catalog directory does not exist: " + repositoryRoot.getAbsolutePath();
+        }
+        String source = entry.getSource();
+        if (source == null || source.trim().isEmpty()) {
+            return "Marketplace plugin '" + entry.getName() + "' has an empty source path.";
+        }
+
+        Path sourcePath;
         try {
-            Path repoCanonicalPath = repositoryRoot.getCanonicalFile().toPath();
-            Path sourceCanonicalPath = sourceDir.getCanonicalFile().toPath();
-            
-            if (!sourceCanonicalPath.startsWith(repoCanonicalPath)) {
-                return false; // Path traversal or symlink escape
+            sourcePath = Path.of(source.replace('\\', '/')).normalize();
+        } catch (InvalidPathException e) {
+            return "Marketplace plugin '" + entry.getName() + "' has an invalid source path: " + source;
+        }
+
+        if (sourcePath.isAbsolute() || sourcePath.startsWith("..") || hasParentTraversal(sourcePath)) {
+            return "Marketplace plugin '" + entry.getName() + "' source escapes the catalog: " + source;
+        }
+
+        File sourceDir = repositoryRoot.toPath().resolve(sourcePath).toFile();
+        try {
+            File repoCanonicalFile = repositoryRoot.getCanonicalFile();
+            File sourceCanonicalFile = sourceDir.getCanonicalFile();
+            Path repoCanonicalPath = repoCanonicalFile.toPath();
+            Path sourceCanonicalPath = sourceCanonicalFile.toPath();
+
+            if (!startsWith(sourceCanonicalPath, repoCanonicalPath)) {
+                return "Marketplace plugin '" + entry.getName() + "' source escapes the catalog: " + sourceCanonicalFile.getAbsolutePath();
             }
             if (!sourceDir.exists() || !sourceDir.isDirectory()) {
-                return false;
+                return "Marketplace plugin '" + entry.getName() + "' source directory does not exist: " + sourceDir.getAbsolutePath();
             }
-            return true;
+            return null;
         } catch (Exception e) {
-            return false;
+            return "Unable to validate marketplace plugin '" + entry.getName() + "' source path: " + e.getMessage();
         }
+    }
+
+    public File resolvePluginSourceDirectory(MarketplacePluginEntry entry, File repositoryRoot) {
+        String source = entry.getSource().replace('\\', '/');
+        return repositoryRoot.toPath().resolve(Path.of(source).normalize()).toFile();
+    }
+
+    private boolean hasParentTraversal(Path path) {
+        for (Path segment : path) {
+            if ("..".equals(segment.toString())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean startsWith(Path child, Path root) {
+        if (child.startsWith(root)) {
+            return true;
+        }
+        if (File.separatorChar == '\\') {
+            return child.toString().toLowerCase().startsWith(root.toString().toLowerCase());
+        }
+        return false;
     }
 
     public boolean validatePluginManifest(PluginManifest manifest, MarketplacePluginEntry entry) {

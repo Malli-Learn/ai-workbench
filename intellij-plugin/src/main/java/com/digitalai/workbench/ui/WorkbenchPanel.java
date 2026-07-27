@@ -253,10 +253,11 @@ public class WorkbenchPanel {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 try {
-                    if (!validator.validatePluginEntry(entry, currentCatalogDir)) {
-                        throw new Exception("Invalid plugin source path.");
+                    String validationError = validator.getPluginEntryValidationError(entry, currentCatalogDir);
+                    if (validationError != null) {
+                        throw new Exception(validationError);
                     }
-                    File sourceDir = new File(currentCatalogDir, entry.getSource());
+                    File sourceDir = validator.resolvePluginSourceDirectory(entry, currentCatalogDir);
                     PluginManifest pluginManifest = parser.parsePlugin(sourceDir);
                     if (!validator.validatePluginManifest(pluginManifest, entry)) {
                         throw new Exception("Invalid plugin.json in source directory.");

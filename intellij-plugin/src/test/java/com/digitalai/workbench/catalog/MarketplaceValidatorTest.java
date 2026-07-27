@@ -31,6 +31,31 @@ public class MarketplaceValidatorTest {
     }
 
     @Test
+    public void acceptsExistingNestedSourcePath() throws Exception {
+        File root = Files.createTempDirectory("marketplace").toFile();
+        File pluginDir = new File(root, "plugins/java-engineering/java-unit-test-coverage");
+        pluginDir.mkdirs();
+
+        MarketplacePluginEntry entry = entry("java-unit-test-coverage", "plugins/java-engineering/java-unit-test-coverage");
+
+        MarketplaceValidator validator = new MarketplaceValidator();
+        assertTrue(validator.validatePluginEntry(entry, root));
+        assertEquals(pluginDir.getCanonicalFile(), validator.resolvePluginSourceDirectory(entry, root).getCanonicalFile());
+    }
+
+    @Test
+    public void reportsMissingSourceDirectory() throws Exception {
+        File root = Files.createTempDirectory("marketplace").toFile();
+        MarketplacePluginEntry entry = entry("java-unit-test-coverage", "plugins/java-engineering/java-unit-test-coverage");
+
+        String error = new MarketplaceValidator().getPluginEntryValidationError(entry, root);
+
+        assertNotNull(error);
+        assertTrue(error.contains("source directory does not exist"));
+        assertTrue(error.contains("java-unit-test-coverage"));
+    }
+
+    @Test
     public void rejectsPluginNameMismatch() throws Exception {
         File pluginDir = Files.createTempDirectory("plugin").toFile();
         writeFile(new File(pluginDir, "plugin.json"), "{ \"name\": \"actual-name\" }");
