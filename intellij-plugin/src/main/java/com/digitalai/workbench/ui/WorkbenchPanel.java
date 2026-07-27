@@ -260,7 +260,11 @@ public class WorkbenchPanel {
                     File sourceDir = validator.resolvePluginSourceDirectory(entry, currentCatalogDir);
                     PluginManifest pluginManifest = parser.parsePlugin(sourceDir);
                     if (!validator.validatePluginManifest(pluginManifest, entry)) {
-                        throw new Exception("Invalid plugin.json in source directory.");
+                        String manifestName = pluginManifest == null ? "missing or unreadable" : pluginManifest.getName();
+                        throw new Exception("Invalid plugin manifest for marketplace plugin '" + entry.getName() + "'.\n"
+                            + "Expected plugin.json name: " + entry.getName() + "\n"
+                            + "Actual plugin.json name: " + manifestName + "\n"
+                            + "Source directory: " + sourceDir.getAbsolutePath());
                     }
                     
                     if (pluginManifest.hasUnsupportedComponents()) {

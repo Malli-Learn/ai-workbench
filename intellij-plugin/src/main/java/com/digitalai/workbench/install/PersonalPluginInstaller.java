@@ -20,25 +20,25 @@ public class PersonalPluginInstaller {
     private final ChecksumService checksumService = new ChecksumService();
     private final Supplier<InstallationRegistry> registrySupplier;
     private final Consumer<InstallationRegistry> registrySaver;
-    private final File userHome;
+    private final PersonalCopilotPaths copilotPaths;
 
     public PersonalPluginInstaller() {
         InstallationRegistryService registryService = InstallationRegistryService.getInstance();
         this.registrySupplier = registryService::getRegistry;
         this.registrySaver = registryService::saveRegistry;
-        this.userHome = new File(System.getProperty("user.home"));
+        this.copilotPaths = new PersonalCopilotPaths(new File(System.getProperty("user.home")));
     }
 
     public PersonalPluginInstaller(Supplier<InstallationRegistry> registrySupplier, Consumer<InstallationRegistry> registrySaver, File userHome) {
         this.registrySupplier = registrySupplier;
         this.registrySaver = registrySaver;
-        this.userHome = userHome;
+        this.copilotPaths = new PersonalCopilotPaths(userHome);
     }
 
     public String install(MarketplacePluginEntry entry, PluginManifest manifest, File pluginSourceDir) throws Exception {
         InstallationRegistry registry = registrySupplier.get();
-        File agentsTargetDir = new File(userHome, ".copilot/agents");
-        File skillsTargetDir = new File(userHome, ".copilot/skills");
+        Path agentsTargetDir = copilotPaths.agentsDirectory();
+        Path skillsTargetDir = copilotPaths.skillsDirectory();
 
         verifyExistingInstallation(entry.getName(), registry);
 
@@ -55,35 +55,35 @@ public class PersonalPluginInstaller {
             List<File> skillDirs = discoverSkillDirectories(pluginSourceDir, manifest);
 
             for (File agentFile : agentFiles) {
-                File targetFile = new File(agentsTargetDir, agentFile.getName());
+                Path targetFile = agentsTargetDir.resolve(agentFile.getName());
                 String sourceChecksum = checksumService.calculateChecksum(agentFile);
-                checkConflict(targetFile, sourceChecksum, entry.getName(), registry, false);
+                checkConflict(targetFile.toFile(), sourceChecksum, registry, false);
 
-                agentsTargetDir.mkdirs();
-                File tempFile = Files.createTempFile(agentsTargetDir.toPath().getParent(), "agent-", ".md").toFile();
+                Files.createDirectories(agentsTargetDir);
+                File tempFile = Files.createTempFile(agentsTargetDir.getParent(), "agent-", ".md").toFile();
                 Files.copy(agentFile.toPath(), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 tempFiles.add(tempFile);
 
-                InstallationRegistry.ComponentInfo info = componentInfo(agentFile.getName(), "~/.copilot/agents/" + agentFile.getName(), sourceChecksum);
+                InstallationRegistry.ComponentInfo info = componentInfo(agentFile.getName(), copilotPaths.agentRegistryPath(agentFile.getName()), sourceChecksum);
                 installedInfo.getAgents().add(info);
 
-                Files.move(tempFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+                Files.move(tempFile.toPath(), targetFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
             }
 
             for (File skillDir : skillDirs) {
-                File targetDir = new File(skillsTargetDir, skillDir.getName());
+                Path targetDir = skillsTargetDir.resolve(skillDir.getName());
                 String sourceChecksum = checksumService.calculateChecksum(skillDir);
-                checkConflict(targetDir, sourceChecksum, entry.getName(), registry, true);
+                checkConflict(targetDir.toFile(), sourceChecksum, registry, true);
 
-                InstallationRegistry.ComponentInfo info = componentInfo(skillDir.getName(), "~/.copilot/skills/" + skillDir.getName(), sourceChecksum);
+                InstallationRegistry.ComponentInfo info = componentInfo(skillDir.getName(), copilotPaths.skillRegistryPath(skillDir.getName()), sourceChecksum);
                 installedInfo.getSkills().add(info);
 
-                if (!targetDir.exists()) {
-                    skillsTargetDir.mkdirs();
-                    File tempDir = Files.createTempDirectory(skillsTargetDir.toPath(), "skill-").toFile();
+                if (!Files.exists(targetDir)) {
+                    Files.createDirectories(skillsTargetDir);
+                    File tempDir = Files.createTempDirectory(skillsTargetDir, "skill-").toFile();
                     copyDirectory(skillDir.toPath(), tempDir.toPath());
                     tempFiles.add(tempDir);
-                    Files.move(tempDir.toPath(), targetDir.toPath(), StandardCopyOption.ATOMIC_MOVE);
+                    Files.move(tempDir.toPath(), targetDir, StandardCopyOption.ATOMIC_MOVE);
                 }
                 addSharedOwner(registry, info.getPath(), sourceChecksum, entry.getName());
             }
@@ -91,8 +91,13 @@ public class PersonalPluginInstaller {
             registry.getInstalledPlugins().put(entry.getName(), installedInfo);
             registrySaver.accept(registry);
 
-            return String.format("%s installed successfully.\n\nAgents installed: %d\nSkills installed: %d\n\nPersonal locations:\n~/.copilot/agents\n~/.copilot/skills\n\nRestart IntelliJ or reopen GitHub Copilot Chat to reload personal customizations.",
-                    entry.getName(), installedInfo.getAgents().size(), installedInfo.getSkills().size());
+            return String.format("%s installed successfully.\n\nAgents installed: %d\nSkills installed: %d\n\nDetected OS: %s\nPersonal agent path:\n%s\nPersonal skill path:\n%s\n\nRestart IntelliJ or reopen GitHub Copilot Chat to reload personal customizations.",
+                    entry.getName(),
+                    installedInfo.getAgents().size(),
+                    installedInfo.getSkills().size(),
+                    copilotPaths.operatingSystemLabel(),
+                    copilotPaths.agentsDirectory(),
+                    copilotPaths.skillsDirectory());
         } catch (Exception e) {
             for (File temp : tempFiles) {
                 deleteDirectory(temp);
@@ -111,7 +116,7 @@ public class PersonalPluginInstaller {
         List<String> retainedFiles = new ArrayList<>();
 
         for (InstallationRegistry.ComponentInfo agent : info.getAgents()) {
-            File targetFile = resolvePath(agent.getPath(), userHome);
+            File targetFile = resolvePath(agent.getPath());
             if (targetFile.exists()) {
                 String currentChecksum = checksumService.calculateChecksum(targetFile);
                 if (currentChecksum != null && !currentChecksum.equals(agent.getChecksum())) {
@@ -123,7 +128,7 @@ public class PersonalPluginInstaller {
         }
 
         for (InstallationRegistry.ComponentInfo skill : info.getSkills()) {
-            File targetDir = resolvePath(skill.getPath(), userHome);
+            File targetDir = resolvePath(skill.getPath());
             InstallationRegistry.SharedResourceInfo shared = registry.getSharedResources().get(skill.getPath());
             if (shared != null) {
                 shared.getOwners().remove(pluginName);
@@ -169,7 +174,7 @@ public class PersonalPluginInstaller {
     }
 
     private void verifyManagedComponentUnmodified(InstallationRegistry.ComponentInfo component, String pluginName) throws Exception {
-        File target = resolvePath(component.getPath(), userHome);
+        File target = resolvePath(component.getPath());
         if (!target.exists()) return;
         String currentChecksum = checksumService.calculateChecksum(target);
         if (currentChecksum != null && !currentChecksum.equals(component.getChecksum())) {
@@ -177,11 +182,11 @@ public class PersonalPluginInstaller {
         }
     }
 
-    private void checkConflict(File target, String sourceChecksum, String pluginName, InstallationRegistry registry, boolean shareable) throws Exception {
+    private void checkConflict(File target, String sourceChecksum, InstallationRegistry registry, boolean shareable) throws Exception {
         if (!target.exists()) return;
 
         String existingChecksum = checksumService.calculateChecksum(target);
-        String targetPath = (shareable ? "~/.copilot/skills/" : "~/.copilot/agents/") + target.getName();
+        String targetPath = shareable ? copilotPaths.skillRegistryPath(target.getName()) : copilotPaths.agentRegistryPath(target.getName());
         InstallationRegistry.ComponentInfo managedComponent = findManagedComponent(registry, targetPath);
 
         if (managedComponent == null) {
@@ -300,11 +305,8 @@ public class PersonalPluginInstaller {
         }
     }
 
-    private File resolvePath(String path, File userHome) {
-        if (path.startsWith("~/")) {
-            return new File(userHome, path.substring(2));
-        }
-        return new File(path);
+    private File resolvePath(String path) {
+        return copilotPaths.resolveRegistryPath(path).toFile();
     }
 
     private void copyDirectory(Path source, Path target) throws IOException {
